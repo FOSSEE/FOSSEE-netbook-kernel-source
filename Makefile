@@ -1415,7 +1415,8 @@ clean: $(clean-dirs)
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
 		-o -name '*.symtypes' -o -name 'modules.order' \
 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
-		-o -name '*.gcno' \) -type f -print | xargs rm -f
+		-o -name '*.gcno' \
+		 \) -type f -print | grep -v -E "drivers/media/video/wmt" |  xargs rm -f
 
 # Generate tags for editors
 # ---------------------------------------------------------------------------
