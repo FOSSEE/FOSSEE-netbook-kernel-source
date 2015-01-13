@@ -1,0 +1,3 @@
+kernel/drivers/media/video/wmt/encode/g_wmt_ve_com.ko
+kernel/drivers/media/video/wmt/encode/g_wmt_ve_h264.ko
+kernel/drivers/media/video/wmt/encode/g_wmt_ve_jenc.ko

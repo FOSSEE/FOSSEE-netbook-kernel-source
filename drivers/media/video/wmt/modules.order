@@ -1,0 +1,4 @@
+kernel/drivers/media/video/wmt/g_wmt_lock.ko
+kernel/drivers/media/video/wmt/g_wmt_vd_com.ko
+kernel/drivers/media/video/wmt/g_wmt_msvd.ko
+kernel/drivers/media/video/wmt/g_wmt_vd_jdec.ko

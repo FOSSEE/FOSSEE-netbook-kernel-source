@@ -1,0 +1,1 @@
+cmd_drivers/media/video/wmt/encode/g_wmt_ve_com.ko := arm_1103_le-ld -EL -r  -T /home/srikant/stuff/wm8880-stuff/wm8880_4_4_kernel/ANDROID_3.4.5/scripts/module-common.lds --build-id  -o drivers/media/video/wmt/encode/g_wmt_ve_com.ko drivers/media/video/wmt/encode/g_wmt_ve_com.o drivers/media/video/wmt/encode/g_wmt_ve_com.mod.o

@@ -1,0 +1,1 @@
+cmd_drivers/media/video/wmt/encode/g_wmt_ve_jenc.o := arm_1103_le-ld -EL    -r -o drivers/media/video/wmt/encode/g_wmt_ve_jenc.o drivers/media/video/wmt/encode/jpeg/hw-jenc.o drivers/media/video/wmt/encode/jpeg/wmt-jenc.o 
