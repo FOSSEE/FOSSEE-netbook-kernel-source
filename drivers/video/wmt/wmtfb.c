@@ -2066,8 +2066,8 @@ for (i = 0; i < VPP_VOUT_INFO_NUM; i++) {
 			vpp_show_timing("cur", &cur, 0);
 			vpp_show_timing("new", &var, 0);
 #endif
-			vout_config(mask, vo_info, &var);
 		}
+		vout_config(mask, vo_info, &var);
 	}
 }
 	vpp_set_mutex(info->node, 0);

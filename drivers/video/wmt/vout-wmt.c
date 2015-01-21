@@ -950,7 +950,7 @@ const char *vout_sys_parm_str[] = {"wmt.display.param", "wmt.display.param2"};
 int vout_check_display_info(struct vout_init_parm_t *init_parm)
 {
 	char buf[100];
-	const char *display_param[] = { "2:0:24:1024:600:60", "4:0:24:1024:600:60" };
+	const char *display_param[] = { "2:0:24:1024:600:60", "4:0:24:1280:720:60" };
 	int varlen = 100;
 	unsigned int parm[10];
 	vout_t *vo = 0;
