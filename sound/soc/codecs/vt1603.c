@@ -71,10 +71,16 @@ struct vt1603_boardinfo {
 	int timer_del; //2014-1-20 tvbox
 	
 	int out_on; //2014-4-29 av out on for tvbox noisy. hw not good!
+	unsigned char in_record;
+	unsigned char trigger_stat;
 };
 static struct vt1603_boardinfo vt1603_boardinfo;
 
 extern int wmt_getsyspara(char *varname, unsigned char *varval, int *varlen);
+static struct work_struct vt1603_hw_mute_work;
+
+/* codec hw configuration */
+static int hw_mute_flag = 0;
 
 static const u16 vt1603_regs[] = {
 	0x0020, 0x00D7, 0x00D7, 0x0004,  /* 0-3 */
@@ -810,8 +816,107 @@ static int vt1603_set_bias_level(struct snd_soc_codec *codec,
 	return 0;
 }
 
+static int vt1603_mute(struct snd_soc_dai *dai, int mute)
+{
+        struct snd_soc_codec *codec = dai->codec;
+        u16 reg = snd_soc_read(codec, VT1603_R0b);
+
+        if (mute)
+                reg |= BIT0;
+        else
+                reg &= ~BIT0;
+
+        snd_soc_write(codec, VT1603_R0b, reg);
+
+        return 0;
+}
+
+/*
+ * The defferent between vt1603_hw_mute and vt1603_mute is that
+ * vt1603_mute only do software mute, while vt1603_hw_mute
+ * let L/R channel power down.
+ */
+static int vt1603_hw_mute(struct snd_soc_codec *codec, int mute)
+{
+        u16 reg;
+
+        /* If current output mixer connect to AA, means that it's in incall mode,
+         * don't power down class-d channels.
+         */
+        /*reg = snd_soc_read(codec, VT1603_R71);
+        if (reg & BIT3 || reg & BIT2)
+                return 0;*/
+
+        reg = snd_soc_read(codec, VT1603_R82);
+        if (mute)
+                reg |= BIT4+BIT3;
+        else
+                reg &= ~(BIT4+BIT3);
+
+        snd_soc_write(codec, VT1603_R82, reg);
+
+        return 0;
+}
+
+static void vt1603_do_hw_mute_work(struct work_struct *work )
+{
+        struct snd_soc_codec *codec = gvt1603_codec;
+        u16 reg;
+
+        vt1603_hw_mute(codec, hw_mute_flag);
+
+        if (vt1603_boardinfo.in_record)
+                if (vt1603_boardinfo.trigger_stat == SNDRV_PCM_TRIGGER_START) {
+                        reg = snd_soc_read(codec, VT1603_R63);
+                        reg |= (BIT6 | BIT7);
+                        snd_soc_write(codec, VT1603_R63, reg);
+                }
+                else if (vt1603_boardinfo.trigger_stat == SNDRV_PCM_TRIGGER_STOP) {
+                        reg = snd_soc_read(codec, VT1603_R63);
+                        reg &= ~(BIT6 | BIT7);
+                        snd_soc_write(codec, VT1603_R63, reg);
+
+                        vt1603_boardinfo.in_record = 0;
+                }
+}
+
+/*
+ * vt1603_trigger to disable/enable channels output while pcm stream is
+ * pause/playing. Avoid sharp noise while pcm stream is not playing.
+ * Note that don't add printk that will cause a loud POP.
+ */
+static int vt1603_trigger(struct snd_pcm_substream *substream,
+                int cmd, struct snd_soc_dai *codec_dai)
+{
+        switch (cmd) {
+        case SNDRV_PCM_TRIGGER_START:
+        case SNDRV_PCM_TRIGGER_RESUME:
+        case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
+                if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
+                        hw_mute_flag = 0;
+                if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
+                        vt1603_boardinfo.in_record = 1;
+                        vt1603_boardinfo.trigger_stat = SNDRV_PCM_TRIGGER_START;
+                }
+                break;
+        case SNDRV_PCM_TRIGGER_STOP:
+        case SNDRV_PCM_TRIGGER_SUSPEND:
+        case SNDRV_PCM_TRIGGER_PAUSE_PUSH:
+                if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
+                        hw_mute_flag = 1;
+                if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
+                        vt1603_boardinfo.trigger_stat = SNDRV_PCM_TRIGGER_STOP;
+                break;
+        }
+
+        schedule_work(&vt1603_hw_mute_work);
+        return 0;
+}
+
 static struct snd_soc_dai_ops vt1603_dai_ops = {
 	.hw_params    = vt1603_pcm_hw_params,
+	.digital_mute = vt1603_mute,
+	.trigger      = vt1603_trigger,
 	.set_fmt      = vt1603_set_dai_fmt,
 	.set_sysclk   = vt1603_set_dai_sysclk,
 };
@@ -1210,6 +1315,7 @@ static int vt1603_codec_probe(struct snd_soc_codec *codec)
 	vt1603_codec_init(codec);
 	vt1603_set_bias_level(codec, SND_SOC_BIAS_PREPARE);    
 
+	INIT_WORK(&vt1603_hw_mute_work, vt1603_do_hw_mute_work);
 	INIT_WORK(&vt1603->work, vt1603_codec_irq_handle);
 	if (!vt1603_boardinfo.timer_del) { //add 2014-1-20 tvbox
 		init_timer(&vt1603->timer);
