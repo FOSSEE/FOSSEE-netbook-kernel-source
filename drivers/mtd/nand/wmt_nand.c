@@ -397,7 +397,7 @@ struct mtd_partition nand_partitions[] = {
 	{
 		.name           = "ubuntu-rootfs",
 		.offset         = MTDPART_OFS_APPEND,
-		.size           = MTDPART_SIZ_FULL,
+		.size		= MTDPART_SIZ_FULL,
 	}
 #endif
 };
@@ -416,9 +416,19 @@ struct mtd_partition nand_partitions[] = {
         .size		= 0x1000000,
     },
     {
+        .name		= "swap",
+        .offset		= MTDPART_OFS_APPEND,
+        .size		= 0x19000000,
+    },
+    {
+        .name		= "reserved",
+        .offset		= MTDPART_OFS_APPEND,
+        .size		= 0x6400000,
+    },
+    {
 		.name		= "ubuntu-rootfs",
 		.offset		= MTDPART_OFS_APPEND,
-		.size		= MTDPART_SIZ_FULL,
+		.size           = MTDPART_SIZ_FULL,
     }
 };
 
