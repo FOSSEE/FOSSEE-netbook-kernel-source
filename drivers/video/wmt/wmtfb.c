@@ -1997,6 +1997,7 @@ int vpp_set_par(struct fb_info *info)
 	vout_info_t *vo_info;
 	unsigned int mask;
 	int i;
+	static int count = 2;
 
 	if (g_vpp.hdmi_certify_flag)
 		return 0;
@@ -2026,8 +2027,11 @@ for (i = 0; i < VPP_VOUT_INFO_NUM; i++) {
 			vpp_show_framebuf("cur", &vo_info->fb);
 			vpp_show_framebuf("new", &fb);
 #endif
-			vo_info->fb = fb;
-			vout_set_framebuffer(mask, &vo_info->fb);
+			if (count < 0) {
+				vo_info->fb = fb;
+				vout_set_framebuffer(mask, &vo_info->fb);
+			}
+			count--;
 		}
 	}
 
@@ -2066,8 +2070,8 @@ for (i = 0; i < VPP_VOUT_INFO_NUM; i++) {
 			vpp_show_timing("cur", &cur, 0);
 			vpp_show_timing("new", &var, 0);
 #endif
-		}
 		vout_config(mask, vo_info, &var);
+		}
 	}
 }
 	vpp_set_mutex(info->node, 0);
