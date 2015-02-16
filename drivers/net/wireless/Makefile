@@ -86,6 +86,6 @@ obj-$(CONFIG_BCMDHD)	+= bcmdhd.1.28.23.x.cn/
 obj-$(CONFIG_NMC1XXX_WIFI_MODULE) += nmi/
 obj-m += nmi_android4.4_driver/src/nmi_memory/
 obj-$(CONFIG_NMC1XXX_WIFI_MODULE) += nmi_android4.4_driver/
-obj-y += combo_mt66xx/
+#obj-y += combo_mt66xx/
 obj-y += rda/
 obj-$(MTK_MT5931_KK)	+= mt5931/
