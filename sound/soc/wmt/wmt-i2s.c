@@ -223,11 +223,15 @@ void wmt_i2s_ch_config(void)
 		ASMPF2HDACHCFG_VAL = 0x76543200;
 	}
 
+	// Disable below piece of code to redirect audio on speaker and
+	// HDMI both while HDMI plugged-in
+#if 0
 	if (i2s_data->HDMI_aud_enable) {
 		/* disable DAC#0, if HDMI Audio is enabled  */
 		ASMPFCHCFG0_VAL &= 0xFFFF00FF;
 		ASMPFCHCFG0_VAL |= 0x00009800;
 	}
+#endif
 
 	/* HDMI_SPDIF_STATE = 3, means disable HDMI&SPDIF
 	                      4, means enable HDMI only
