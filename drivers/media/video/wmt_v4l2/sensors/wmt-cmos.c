@@ -332,8 +332,8 @@ struct wmt_fmt {
 
 static struct wmt_fmt formats[] = {
 	{
-		.name     = "4:2:2, packed, YUYV",
-		.fourcc   = V4L2_PIX_FMT_YUYV,
+		.name     = "4:2:0, packed, NV21",
+		.fourcc   = V4L2_PIX_FMT_NV21,
 		.depth    = 16,
 	},
 };
@@ -634,6 +634,7 @@ static int cmos_cam_dqbuf(struct file *file, void *fh, struct v4l2_buffer *b)
 	b->length   = drv->frame_size;
 	b->m.offset = fb->y_addr;
 	b->index    = fb->id;
+	b->bytesused = drv->frame_size;
 
 EXIT_cmos_cam_dqbuf:
 	mutex_unlock(&info->lock);
