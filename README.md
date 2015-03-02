@@ -37,15 +37,14 @@
   cd FOSSEE-netbook-kernel-source
   make mrproper
   make distclean
-  cp dot_config .config
-  #make Android_defconfig (Optional. Only do if you need default configuration)
-  make ARCH=arm CROSS_COMPILE=arm_1103_le- ubin
+  make make ARCH=arm CROSS_COMPILE=arm_1103_le- wm8880_Linux_defconfig
+  make ARCH=arm CROSS_COMPILE=arm_1103_le- ubin -j4
 ```
 
 * Compile modules and copy them to `out` directory
 
 ```
-  make ARCH=arm CROSS_COMPILE=arm_1103_le- INSTALL_MOD_PATH=out modules -j4
+  make ARCH=arm CROSS_COMPILE=arm_1103_le- INSTALL_MOD_PATH=out modules -j8
   make ARCH=arm CROSS_COMPILE=arm_1103_le- INSTALL_MOD_PATH=out modules_install
 ```
 

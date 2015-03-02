@@ -3,4 +3,7 @@
 #
 
 
-
+config WMT_VIDEO_LOCK
+        tristate "WonderMedia Video Lock"
+        ---help---
+          Say Y here to enable Video Lock
